@@ -1,51 +1,50 @@
 package com.naruto;
 
+import com.naruto.handler.AbstractHandler;
+import com.naruto.handler.CopyByKeysHandler;
+import com.naruto.handler.DeleteByKeysHandler;
+import com.naruto.handler.MoveByKeysHandler;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import redis.clients.jedis.Jedis;
 
-import java.util.Set;
-
 /**
- * Hello world!
+ * Main方法入口
+ * @author naruto
  */
 public class App {
-    public static void main(String[] args)  {
+    public static void main(String[] args) {
 
         Options options = new Options();
         CmdLineParser p = new CmdLineParser(options);
         try {
             p.parseArgument(args);
-            System.out.println("参数:" +options);
+            System.out.println("参数:" + options);
         } catch (CmdLineException e) {
             e.printStackTrace();
         }
 
 
-        Jedis jedis = new Jedis(options.getHost(), options.getPort());
+        Jedis jedis = Util.createJedis(options.getHost(), options.getPort(), options.getPassword(), options.getDbIndex());
 
-        String password = options.getPassword();
-        if (password != null && !password.isEmpty()) {
-            String authResult = jedis.auth(password);
-            System.out.println("密码认证结果:" + authResult);
+        AbstractHandler handler = null;
+        switch (options.getFunction()) {
+            case DEL_BY_KEYS:
+                handler = new DeleteByKeysHandler(jedis, options.getParams());
+                break;
+            case MOVE_BY_KEYS:
+                handler = new MoveByKeysHandler(jedis, options.getParams());
+                break;
+            case COPY_BY_KEYS:
+                handler = new CopyByKeysHandler(jedis, options.getParams());
+                break;
         }
-
-        jedis.select(options.getDbIndex());
-
-        Set<byte[]> keySet = jedis.keys(options.getKeysPattern().getBytes());
-        if (keySet == null || keySet.isEmpty()) {
-            System.out.println("没有匹配的key列表");
-            jedis.close();
+        if (handler == null) {
+            System.out.println("不支持的功能:" + options.getFunction());
             return;
         }
-        System.out.println("根据表达式找到"+keySet.size()+"个key!");
+        handler.execute();
 
-        keySet.forEach(key -> {
-            System.out.print("删除key:" + new String(key) + ",");
-            Long del = jedis.del(key);
-            System.out.print(del > 0 ? "成功" : "失败");
-            System.out.println("!");
-        });
         jedis.close();
         System.out.println("Done!");
     }

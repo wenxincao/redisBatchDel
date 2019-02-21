@@ -1,11 +1,15 @@
 package com.naruto;
 
+import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.Option;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * 命令行参数
+ * 命令行基础参数
  *
- * @author Min.Xu
+ * @author naruto
  * @date 2019-02-20 10:10
  **/
 public class Options {
@@ -18,8 +22,17 @@ public class Options {
     private String password = "";
     @Option(name = "-n", usage = "dbIndex", required = false)
     private int dbIndex = 0;
-    @Option(name = "-keys", usage = "keys pattern", required = true)
-    private String keysPattern;
+//    @Option(name = "-keys", usage = "keys pattern", required = true)
+//    private String keysPattern;
+
+    @Option(name = "-params", usage = "params", required = false)
+    private String params;
+
+    @Option(name = "-f", usage = "function", required = true)
+    private Function function;
+
+    @Argument
+    private List<String> arguments = new ArrayList<String>();
 
     public String getHost() {
         return host;
@@ -53,12 +66,36 @@ public class Options {
         this.dbIndex = dbIndex;
     }
 
-    public String getKeysPattern() {
-        return keysPattern;
+//    public String getKeysPattern() {
+//        return keysPattern;
+//    }
+//
+//    public void setKeysPattern(String keysPattern) {
+//        this.keysPattern = keysPattern;
+//    }
+
+    public String getParams() {
+        return params;
     }
 
-    public void setKeysPattern(String keysPattern) {
-        this.keysPattern = keysPattern;
+    public void setParams(String params) {
+        this.params = params;
+    }
+
+    public Function getFunction() {
+        return function;
+    }
+
+    public void setFunction(Function function) {
+        this.function = function;
+    }
+
+    public List<String> getArguments() {
+        return arguments;
+    }
+
+    public void setArguments(List<String> arguments) {
+        this.arguments = arguments;
     }
 
     @Override
@@ -68,7 +105,9 @@ public class Options {
                 ", port=" + port +
                 ", password='" + password + '\'' +
                 ", dbIndex=" + dbIndex +
-                ", keysPattern='" + keysPattern + '\'' +
+                ", params='" + params + '\'' +
+                ", function='" + function + '\'' +
+                ", arguments=" + arguments +
                 '}';
     }
 }
