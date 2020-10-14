@@ -1,5 +1,6 @@
 package com.naruto.handler;
 
+import com.naruto.JedisClient;
 import redis.clients.jedis.Jedis;
 
 /**
@@ -10,11 +11,11 @@ import redis.clients.jedis.Jedis;
  **/
 public class CopyByKeysHandler extends MoveByKeysHandler {
 
-    public CopyByKeysHandler(Jedis jedis, String params) {
+    public CopyByKeysHandler(JedisClient jedis, String params) {
         super(jedis, params);
     }
 
     @Override
-    public void doAfterCopyKey(Jedis sourceJedis, byte[] key) {
+    public void doAfterCopyKey(JedisClient sourceJedis, byte[] key) {
     }
 }

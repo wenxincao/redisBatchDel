@@ -1,8 +1,10 @@
 package com.naruto.handler;
 
+import com.naruto.JedisClient;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisCluster;
 
 /**
  * jedis操作抽象类
@@ -12,9 +14,10 @@ import redis.clients.jedis.Jedis;
  **/
 public abstract class AbstractHandler {
 
-    private Jedis jedis;
+    private JedisClient jedis;
 
-    public AbstractHandler(Jedis jedis, String params) {
+
+    public AbstractHandler(JedisClient jedis, String params) {
         this.jedis = jedis;
         CmdLineParser p = new CmdLineParser(this);
         try {
@@ -25,7 +28,8 @@ public abstract class AbstractHandler {
         }
     }
 
-    protected Jedis getJedis() {
+
+    public JedisClient getJedis() {
         return jedis;
     }
 

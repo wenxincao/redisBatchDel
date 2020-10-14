@@ -10,5 +10,6 @@ public enum Function {
     DEL_BY_KEYS,
     MOVE_BY_KEYS,
     COPY_BY_KEYS,
+    GET_BY_KEYS,
     ;
 }

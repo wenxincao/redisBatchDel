@@ -31,6 +31,9 @@ public class Options {
     @Option(name = "-f", usage = "function", required = true)
     private Function function;
 
+    @Option(name = "-c", usage = "cluster", required = false)
+    private int cluster = 0;
+
     @Argument
     private List<String> arguments = new ArrayList<String>();
 
@@ -98,6 +101,15 @@ public class Options {
         this.arguments = arguments;
     }
 
+
+    public int getCluster() {
+        return cluster;
+    }
+
+    public void setCluster(int cluster) {
+        this.cluster = cluster;
+    }
+
     @Override
     public String toString() {
         return "Options{" +
@@ -108,6 +120,7 @@ public class Options {
                 ", params='" + params + '\'' +
                 ", function='" + function + '\'' +
                 ", arguments=" + arguments +
+                ", cluster=" + cluster +
                 '}';
     }
 }

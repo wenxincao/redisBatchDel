@@ -40,6 +40,7 @@
     </dependencies>
 
     <build>
+        <finalName>redis-batch-del-allInOne</finalName>
         <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
             <plugins>
                 <!-- clean lifecycle, see https://maven.apache.org/ref/current/maven-core/lifecycles.html#clean_Lifecycle -->
@@ -59,6 +60,16 @@
                 <plugin>
                     <artifactId>maven-jar-plugin</artifactId>
                     <version>3.0.2</version>
+                    <configuration>
+                        <archive>
+                            <manifest>
+                                <addClasspath>true</addClasspath>
+                                <!-- 此处为程序主入口-->
+                                <mainClass>com.naruto.App</mainClass>
+                            </manifest>
+                        </archive>
+                    </configuration>
+
                 </plugin>
                 <plugin>
                     <artifactId>maven-install-plugin</artifactId>
@@ -69,19 +80,52 @@
                     <version>2.8.2</version>
                 </plugin>
                 <!--mvn assembly:assembly-->
+                <!-- <plugin>
+                     <artifactId>maven-assembly-plugin</artifactId>
+                     <version>3.0.0</version>
+                     <configuration>
+                         <archive>
+                             <manifest>
+                                 <mainClass>com.naruto.App</mainClass>
+                             </manifest>
+                         </archive>
+                         <descriptorRefs>  
+                              <descriptorRef>jar-with-dependencies</descriptorRef>
+                         </descriptorRefs>
+                     </configuration>
+                     <executions>
+                         <execution>
+                             <id>make-assembly</id>
+                             <phase>package</phase>
+                             <goals>
+                                 <goal>single</goal>
+                             </goals>
+                         </execution>
+                     </executions>
+                 </plugin>-->
                 <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
+                    <version>2.5.5</version>
                     <configuration>
-                        <finalName>redis-batch-del-allInOne.jar</finalName>
                         <archive>
                             <manifest>
                                 <mainClass>com.naruto.App</mainClass>
                             </manifest>
                         </archive>
-                        <descriptorRefs>  
-                                <descriptorRef>jar-with-dependencies</descriptorRef>  
+                        <descriptorRefs>
+                            <descriptorRef>jar-with-dependencies</descriptorRef>
                         </descriptorRefs>
                     </configuration>
+                    <executions>
+                        <execution>
+                            <id>make-assembly</id>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>single</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>

@@ -3,7 +3,7 @@ Redis Key 批量处理的工具
 
 主要是解决命令行批量处理key时无法处理包含空格、特殊字符的key的问题。如果没有这个问题，可以通过以下命令来批量删除redis中的key：
 ```
-redis-cli -h 主机名 -p 端口号 -a 密码 -n 数据库编号 keys keys表达式 | xargs redis-cli -h 主机名 -p 端口号 -a 密码 -n 数据库编号  del
+redis-cli -h 主机名 -p 端口号 -a 密码 -n 数据库编号 keys keys表达式 | xargs redis-cli -h 主机名 -p 端口号 -a 密码 -n 数据库编号  del -c 集群模式
 ```
 
 
@@ -12,14 +12,23 @@ redis-cli -h 主机名 -p 端口号 -a 密码 -n 数据库编号 keys keys表达
 - args4j
 
 ## 打包
-mvn clean package assembly:signle
+mvn clean package assembly:single
 
 ## 运行
 ```
-# 批量删除key
-java -jar redis-batch-del-allInOne.jar  -h 192.168.1.10 -p 6379 -a mypassword -n 10 -f DEL_BY_KEYS -params "-keys testdel:*"
+# 批量模糊查询key
+单机模式
+java -jar redis-batch-del-allInOne.jar  -h 192.168.1.10 -p 6379 -a mypassword -n 10 -f GET_BY_KEYS -params "-keys testdel:*" -c 0
+集群模式
+java -jar redis-batch-del-allInOne.jar  -h 192.168.1.10 -p 6379 -a mypassword -n 10 -f GET_BY_KEYS -params "-keys testdel:*" -c 1
 
-# 批量移动key，可以跨不同的库
+# 批量删除key
+单机模式
+java -jar redis-batch-del-allInOne.jar  -h 192.168.1.10 -p 6379 -a mypassword -n 10 -f DEL_BY_KEYS -params "-keys testdel:*" -c 0
+集群模式
+java -jar redis-batch-del-allInOne.jar  -h 192.168.1.10 -p 6379 -f DEL_BY_KEYS -params "-keys testdel:*" -c 1
+
+# 批量移动key，可以跨不同的库(未验证，待实现）
 java -jar redis-batch-del-allInOne.jar  -h 192.168.1.10 -p 6379  -n 11 -f MOVE_BY_KEYS -params "-keys * -targetH 192.168.1.12 -targetP 16378 -targetN 1"
 ```
 **通用参数说明:**

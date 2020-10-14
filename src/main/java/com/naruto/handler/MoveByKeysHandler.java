@@ -1,5 +1,6 @@
 package com.naruto.handler;
 
+import com.naruto.JedisClient;
 import com.naruto.Util;
 import org.kohsuke.args4j.Option;
 import redis.clients.jedis.Jedis;
@@ -30,22 +31,21 @@ public class MoveByKeysHandler extends AbstractHandler {
     @Option(name = "-targetN", usage = "targetN", required = true)
     private int targetDbIndex;
 
-    public MoveByKeysHandler(Jedis jedis, String params) {
+    public MoveByKeysHandler(JedisClient jedis, String params) {
         super(jedis, params);
     }
 
     public void execute() {
-        Jedis sourceJedis = getJedis();
+        JedisClient sourceJedis = getJedis();
 
         Set<byte[]> keySet = sourceJedis.keys(keysPattern.getBytes());
         if (keySet == null || keySet.isEmpty()) {
             System.out.println("没有匹配的key列表");
-            sourceJedis.close();
             return;
         }
         System.out.println("根据表达式找到" + keySet.size() + "个key!");
 
-        Jedis targetJedis = Util.createJedis(targetHost, targetPort, targetPassword, targetDbIndex);
+        JedisClient targetJedis = Util.createJedis(targetHost, targetPort, targetPassword, targetDbIndex,0);
         keySet.forEach(key -> {
             String keyStr = new String(key);
             System.out.print("移动key=" + keyStr + ",");
@@ -56,11 +56,11 @@ public class MoveByKeysHandler extends AbstractHandler {
                 doAfterCopyKey(sourceJedis, key);
             }
         });
-        targetJedis.close();
     }
 
-    private boolean moveKey(byte[] key, Jedis sourceJedis, Jedis targetJedis) {
-        String keyStr = new String(key);
+    private boolean moveKey(byte[] key, JedisClient sourceJedis, JedisClient targetJedis) {
+        //todo:待实现
+    /*    String keyStr = new String(key);
 
         if (targetJedis.exists(key)) {
             System.out.print("目标库已存在key=" + keyStr + ".");
@@ -74,7 +74,7 @@ public class MoveByKeysHandler extends AbstractHandler {
             }
             break;
             case "list": {
-                List<byte[]> list = sourceJedis.lrange(key, 0, -1);
+                List<byte[]> list = sourceJedis.lrange(key, 0L, -1L);
                 byte[][] arr = new byte[list.size()][];
                 list.toArray(arr);
                 targetJedis.lpush(key, arr);
@@ -88,7 +88,7 @@ public class MoveByKeysHandler extends AbstractHandler {
             }
             break;
             case "zset": {
-                Set<Tuple> zSet = sourceJedis.zrangeWithScores(key, 0, -1);
+                Set<Tuple> zSet = sourceJedis.zrangeWithScores(key, 0L, -1L);
                 Map<byte[], Double> scoreMembers = new HashMap<>();
                 zSet.forEach(t -> scoreMembers.put(t.getBinaryElement(), t.getScore()));
                 targetJedis.zadd(key, scoreMembers);
@@ -102,7 +102,7 @@ public class MoveByKeysHandler extends AbstractHandler {
             default:
                 System.out.print("不支持的key类型，key=" + keyStr + ",type=" + type + ".");
                 break;
-        }
+        }*/
         return true;
     }
 
@@ -112,7 +112,7 @@ public class MoveByKeysHandler extends AbstractHandler {
      * @param sourceJedis
      * @param key
      */
-    public void doAfterCopyKey(Jedis sourceJedis, byte[] key) {
+    public void doAfterCopyKey(JedisClient sourceJedis, byte[] key) {
         System.out.print("从源db删除key=" + new String(key) + ",");
         Long delCount = sourceJedis.del(key);
         System.out.println(delCount > 0 ? "成功" : "失败");

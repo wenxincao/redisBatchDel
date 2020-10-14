@@ -1,6 +1,6 @@
 package com.naruto;
 
-import redis.clients.jedis.Jedis;
+import redis.clients.jedis.*;
 
 /**
  * 工具类
@@ -18,17 +18,28 @@ public class Util {
      * @param dbIndex
      * @return
      */
-    public static Jedis createJedis(String host, int port, String password, int dbIndex) {
+    public static JedisClient createJedis(String host, int port, String password, int dbIndex,int cluster) {
 
-        Jedis jedis = new Jedis(host, port);
+       if(cluster != 0){
+           JedisClientCluster jedisClientCluster = new JedisClientCluster();
+           HostAndPort hostAndPort = new HostAndPort(host, port);
+           JedisCluster jedisCluster = new JedisCluster(hostAndPort);
+           jedisClientCluster.setJedisCluster(jedisCluster);
 
-        if (password != null && !password.isEmpty()) {
-            String authResult = jedis.auth(password);
-            System.out.println("密码认证结果:" + authResult);
-        }
+           return jedisClientCluster;
+       }else{
+           JedisClientPool jedisClient = new JedisClientPool();
+           JedisPoolConfig poolConfig = new JedisPoolConfig();
+           JedisPool jedisPool;
 
-        jedis.select(dbIndex);
-        return jedis;
+           if (password != null && !password.isEmpty()) {
+               jedisPool  = new JedisPool(poolConfig,host,port,30000,password,dbIndex);
+           }else{
+               jedisPool = new JedisPool(poolConfig,host,port,30000,null,dbIndex);
+           }
+           jedisClient.setJedisPool(jedisPool);
+           return jedisClient;
+       }
     }
 
 }
